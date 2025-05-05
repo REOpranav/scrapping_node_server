@@ -9,7 +9,7 @@ const connectToDB = async () => { // DB connection
     if (!client) {
         client = new MongoClient(uri)
         await client.connect()
-        database = client.db('sample_mflix')
+        database = client.db('data')
     }
     return database;
 }
@@ -38,11 +38,12 @@ const insertOneClient = async (collectionName, insertingData) => { // inserting 
     }
 };
 
-const getParticularclient = async (collectionName, clientID) => { // getting particular data
+const getParticularclient = async (collectionName, clientURLID) => { // getting particular data
+    console.log('Checking already exist or not');
     try {
         const getDatabaseCollection = await connectToDB()
         const collection = getDatabaseCollection?.collection(collectionName)
-        const data = await collection?.find({ "id": `${clientID}` }).toArray()
+        const data = await collection?.find({ "URLName": `${clientURLID}` }).toArray()        
         return data
     } catch (err) {
         console.error('Error retrieving data:', err);
@@ -69,7 +70,7 @@ const updateClient = async (collectionName, clientID, updatedContent) => { // up
         const getDatabaseCollection = await connectToDB()
         const collection = getDatabaseCollection?.collection(collectionName)
         const data = await collection?.replaceOne(
-            { "id": `${clientID}` },
+            { "_id": `${clientID}` },
             updatedContent
         )
         return data

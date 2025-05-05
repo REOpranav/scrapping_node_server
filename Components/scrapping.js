@@ -5,11 +5,17 @@ const scrapeWebsite = async (URL) => {
     console.log('---scrapeWebsite module loaded---');
     console.log(URL);
 
-    let totalDetail = {} // store all nessesary detail
+    let dbStoringHeadsAndURL = {} // this datas only will be store in DB
+    let totalHead = [] // store heading data only
+
+    let totalHeadDetail = {} // store all nessesary detail (not include para module)
     let data = [] // storing relevant heading and it sub paras
+
+    let totalAllDetial = {} // storig all detail (include para module)
     let imagesSrc = [] // stroing images link
 
-    totalDetail['name'] = URL;
+    dbStoringHeadsAndURL['URLName'] = URL
+    totalHeadDetail['URLName'] = URL;
 
     try {
         let fetchHTML = await fetch(URL, {
@@ -27,7 +33,6 @@ const scrapeWebsite = async (URL) => {
                 "Pragma": "no-cache",
                 "Cache-Control": "no-cache"
             },
-            "referrer": "https://www.google.com/",
             "method": "GET",
             "mode": "cors"
         })
@@ -40,9 +45,13 @@ const scrapeWebsite = async (URL) => {
             .replace(/<link[^>]*rel=["']stylesheet["'][^>]*>/gi, ''); // removing outline css from document
 
         const parsingDOM = cheerio.load(htmlOnly); // load the cheerio
-        const paragraphs = parsingDOM('p').map((i, el) => parsingDOM(el).text().trim()).get(); // get all P tag content
+        const paragraphs = parsingDOM('p,li').map((i, el) => parsingDOM(el).text().trim()).get(); // get all P tag content
 
         parsingDOM('img').map((i, el) => { el.attributes.map(nameVal => nameVal.name == 'src' && imagesSrc.push(nameVal.value)) }) // get all images src
+
+        const heading = parsingDOM('h1,h2,h3,h4').map((i, el) => parsingDOM(el).text().trim()).get() // get all images src
+        totalHead.push(heading)
+
         parsingDOM('h1,h2,h3,h4').each((i, h1) => { // Getting <P> tag content
             const section = {
                 heading: parsingDOM(h1).text().trim(),
@@ -61,10 +70,12 @@ const scrapeWebsite = async (URL) => {
             }
         });
 
-        totalDetail['data'] = data
-        totalDetail['paras'] = paragraphs
-        totalDetail['images'] = imagesSrc
-        return totalDetail
+        dbStoringHeadsAndURL['heading'] = totalHead
+        totalHeadDetail['data'] = data
+        totalAllDetial['paras'] = paragraphs
+        totalAllDetial['images'] = imagesSrc
+
+        return { dbStoringHeadsAndURL: dbStoringHeadsAndURL, totalHeadDetail: totalHeadDetail, totalDetail: totalAllDetial }
     } catch (err) {
         return err
     }
@@ -72,3 +83,5 @@ const scrapeWebsite = async (URL) => {
 
 // axios.get('https://en.wikipedia.org/api/rest_v1/page/summary/reactjs').then(val => console.log(val.data)).catch(val => console.log(val))
 module.exports = { scrapeWebsite }
+
+// https://www.toptal.com/designers/web/ui-design-best-practices (testing)

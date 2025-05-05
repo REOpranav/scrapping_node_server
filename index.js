@@ -7,31 +7,34 @@ const app = express()
 const qs = require('qs')
 const cheerio = require('cheerio');
 const { GoogleGenerativeAI } = require('@google/generative-ai')
-const { getDataFromDB } = require('./DB/mongoDB')
+const { getDataFromDB, insertOneClient, getParticularclient } = require('./DB/mongoDB')
+const { storingNewURldata, patchTheStoringURL } = require('./DB/utils')
 require('dotenv').config()
 
 app.use(express.json())
 app.use(cors())
 
-app.use('/scrap/search', async (req, res) => {
+app.use('/scrap/search', async (req, res) => { // scrabing the data
     try {
-        const html = await scrapeWebsite(req.body.formData)
-        res.json(html)
+        let scrappedResponce = await scrapeWebsite(req?.body?.formData)
+        res.send(scrappedResponce)
     } catch (error) {
         console.error(error);
         res.status(500).send('Error occurred while scraping the website.');
     }
+})
 
-    // try {
-    //     getDataFromDB('users').then((value) => {
-    //         res.json(value)
-    //     })
-    // } catch (error) {
-    //     res.status(error.response ? error.response.status : 500).json({
-    //         message: error.message,
-    //         error: error.response ? error.response.data : null
-    //     });
-    // }
+app.use('/db/heads', async (req, res) => { // storing data in mongoDB Atlas
+    if (req.body.timer >= 5 && req.body.timer <= 100000) {
+        const CheckingUrlExist = await getParticularclient('heads', req?.body?.dbStoringHeadsAndURL?.URLName).then(val => { return val })
+        
+        if (CheckingUrlExist && (Array.isArray(CheckingUrlExist) && CheckingUrlExist.length > 0)) {
+            let id = CheckingUrlExist.map(val => val._id)
+            patchTheStoringURL(...id, req?.body?.dbStoringHeadsAndURL)
+        } else {
+            storingNewURldata(req?.body?.dbStoringHeadsAndURL)
+        }
+    }
 })
 
 // running the node in 3002 port
