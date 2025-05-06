@@ -1,28 +1,20 @@
 const { insertOneClient, updateClient } = require("./mongoDB");
 
-const storingNewURldata = (data) => {
+const storingNewURldata = (data) => { // storing new data in DB
     try {
-        insertOneClient('heads', [data]).then((value) => {
-            res?.json(value)
-        })
+        let inserDataState = insertOneClient('heads', [data]) // calling the function which is in mongoDB
+        return inserDataState
     } catch (error) {
-        res.status(error.response ? error.response.status : 500).json({
-            message: error.message,
-            error: error.response ? error.response.data : null
-        });
+        return error
     }
 }
 
-const patchTheStoringURL = (clientUrlID, updatedData) => {
+const patchTheStoringURL = async (clientUrlID, updatedData) => { // updating the data which is already exist
     try {
-        updateClient('heads', clientUrlID, Array.isArray(updatedData) ? updatedData : [updatedData]).then((value) => {
-            res?.json(value)
-        })
+        let updatedState = await updateClient('heads', clientUrlID, updatedData) // calling the function which is in mongoDB
+        return updatedState
     } catch (error) {
-        res.status(error.response ? error.response.status : 500).json({
-            message: error.message,
-            error: error.response ? error.response.data : null
-        });
+        return error
     }
 }
 

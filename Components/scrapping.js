@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 const cheerio = require("cheerio");
 
 const scrapeWebsite = async (URL) => {
-    console.log('---scrapeWebsite module loaded---');
+    console.log('---scrapeWebsite module loaded---');x
     console.log(URL);
 
     let dbStoringHeadsAndURL = {} // this datas only will be store in DB

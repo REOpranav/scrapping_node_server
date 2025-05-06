@@ -14,7 +14,7 @@ const connectToDB = async () => { // DB connection
     return database;
 }
 
-const getDataFromDB = async (collectionName) => { // getting total data from DB    
+const getDataFromDB = async (collectionName) => { // getting total    
     try {
         const getDatabaseCollection = await connectToDB()
         const collection = getDatabaseCollection?.collection(collectionName)
@@ -33,20 +33,17 @@ const insertOneClient = async (collectionName, insertingData) => { // inserting 
         const data = await collection?.insertMany(insertingData)
         return data
     } catch (err) {
-        console.error('Error retrieving data:', err);
         throw err;
     }
 };
 
-const getParticularclient = async (collectionName, clientURLID) => { // getting particular data
-    console.log('Checking already exist or not');
+const getParticularclient = async (collectionName, clientURLID) => { // getting particular data using URLName
     try {
         const getDatabaseCollection = await connectToDB()
         const collection = getDatabaseCollection?.collection(collectionName)
-        const data = await collection?.find({ "URLName": `${clientURLID}` }).toArray()        
+        const data = await collection?.find({ "URLName": `${clientURLID}` }).toArray()
         return data
     } catch (err) {
-        console.error('Error retrieving data:', err);
         throw err;
     }
 };
@@ -56,16 +53,13 @@ const deleteClient = async (collectionName, clientID) => { // delete data from l
         const getDatabaseCollection = await connectToDB()
         const collection = getDatabaseCollection?.collection(collectionName)
         const data = await collection?.deleteOne({ "id": `${clientID}` })
-        console.log(data);
-
         return data
     } catch (err) {
-        console.error('Error retrieving data:', err);
         throw err;
     }
 };
 
-const updateClient = async (collectionName, clientID, updatedContent) => { // update data from leads
+const updateClient = async (collectionName, clientID, updatedContent) => { // replacing one 
     try {
         const getDatabaseCollection = await connectToDB()
         const collection = getDatabaseCollection?.collection(collectionName)
@@ -75,7 +69,6 @@ const updateClient = async (collectionName, clientID, updatedContent) => { // up
         )
         return data
     } catch (err) {
-        console.error('Error retrieving data:', err);
         throw err;
     }
 };

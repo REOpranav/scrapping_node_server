@@ -14,7 +14,8 @@ require('dotenv').config()
 app.use(express.json())
 app.use(cors())
 
-app.use('/scrap/search', async (req, res) => { // scrabing the data
+// scrabing the data
+app.use('/scrap/search', async (req, res) => {
     try {
         let scrappedResponce = await scrapeWebsite(req?.body?.formData)
         res.send(scrappedResponce)
@@ -24,20 +25,23 @@ app.use('/scrap/search', async (req, res) => { // scrabing the data
     }
 })
 
-app.use('/db/heads', async (req, res) => { // storing data in mongoDB Atlas
-    if (req.body.timer >= 5 && req.body.timer <= 100000) {
-        const CheckingUrlExist = await getParticularclient('heads', req?.body?.dbStoringHeadsAndURL?.URLName).then(val => { return val })
+// storing data in mongoDB Atlas
+app.use('/db/heads', async (req, res) => {
+    if (req.body.timer >= 5 && req.body.timer <= 100000) { // checking the time different between one request to next request.if it is greater than 5 secound ,that datas are only store in DB
+
+        const CheckingUrlExist = await getParticularclient('heads', req?.body?.dbStoringHeadsAndURL?.URLName)
         
-        if (CheckingUrlExist && (Array.isArray(CheckingUrlExist) && CheckingUrlExist.length > 0)) {
+        if (CheckingUrlExist?.length > 0) { // checking is there already exist and call the function based on the reult
             let id = CheckingUrlExist.map(val => val._id)
-            patchTheStoringURL(...id, req?.body?.dbStoringHeadsAndURL)
+            let putMessageState = await patchTheStoringURL(...id, req?.body?.dbStoringHeadsAndURL)
+            res.json(putMessageState)
         } else {
-            storingNewURldata(req?.body?.dbStoringHeadsAndURL)
+            let patchMessageState = storingNewURldata(req?.body?.dbStoringHeadsAndURL)
+            res.json(patchMessageState)
         }
     }
 })
 
-// running the node in 3002 port
 const PORT = 3002
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`)
