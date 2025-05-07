@@ -1,10 +1,7 @@
-const { default: axios } = require("axios");
 const cheerio = require("cheerio");
 
 const scrapeWebsite = async (URL) => {
-    console.log('---scrapeWebsite module loaded---');x
-    console.log(URL);
-
+    
     let dbStoringHeadsAndURL = {} // this datas only will be store in DB
     let totalHead = [] // store heading data only
 
@@ -71,6 +68,7 @@ const scrapeWebsite = async (URL) => {
         });
 
         dbStoringHeadsAndURL['heading'] = totalHead
+        dbStoringHeadsAndURL['images'] = imagesSrc.slice(0,10)
         totalHeadDetail['data'] = data
         totalAllDetial['paras'] = paragraphs
         totalAllDetial['images'] = imagesSrc

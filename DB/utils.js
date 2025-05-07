@@ -1,4 +1,4 @@
-const { insertOneClient, updateClient } = require("./mongoDB");
+const { insertOneClient, updateClient, getDataFromDB } = require("./mongoDB");
 
 const storingNewURldata = (data) => { // storing new data in DB
     try {
@@ -18,4 +18,31 @@ const patchTheStoringURL = async (clientUrlID, updatedData) => { // updating the
     }
 }
 
-module.exports = { storingNewURldata, patchTheStoringURL }
+const isURL = (input) => { // checking Incoming params is URL or not 
+    console.log(input);
+    const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i
+    return urlRegex.test(input.trim())
+}
+
+const DBSearching = async (word) => { // searhcing the relevent keyword in DB
+    let searchedDatas = [];
+    const DBData = await getDataFromDB('heads')
+
+    for (let element of DBData) {
+        let found = false
+        for (let value of element.heading) {
+            for (let val of value) {
+                if (val.trim().toLowerCase().includes(word.trim().toLowerCase())) {
+                    searchedDatas.push(element)
+                    found = true
+                    break;
+                }
+            }
+            if (found) break
+        }
+    }
+    return searchedDatas;
+};
+
+
+module.exports = { storingNewURldata, patchTheStoringURL, isURL, DBSearching }
