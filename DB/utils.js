@@ -46,7 +46,6 @@ const DBSearching = async (word) => { // searhcing the relevent keyword in DB
 };
 
 const GeminiSearch = async (trasulationCount) => { // gemini search for extra usage
-    console.log('come to gemini');
 
     try {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_TEXTENHANCER_KEY)
@@ -64,6 +63,7 @@ const GeminiSearch = async (trasulationCount) => { // gemini search for extra us
         }
         
         const sentences = result?.paras.split(/\.\s*/).filter(Boolean); // Remove empty strings
+        result['prompt'] = trasulationCount
         result['paras'] = sentences
 
         return result
